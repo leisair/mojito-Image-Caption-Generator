@@ -10,67 +10,84 @@
     <div class="container">
         <h1>图片字幕生成器</h1>
         
-        <div class="control-group">
-            <label for="imageInput">选择图片：</label>
-            <input type="file" id="imageInput" accept="image/*">
-        </div>
+        <div class="app-layout">
+            <!-- 左侧编辑区 -->
+            <div class="editor-panel">
+                <div class="panel-title">编辑区</div>
+                
+                <div class="control-group image-input-group">
+                    <label for="imageInput">选择图片：</label>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="lineHeight">字幕高度(px):</label>
-                <input type="number" id="lineHeight" value="40">
-            </div>
-            <div class="control-group">
-                <label for="fontSize">字体大小(px):</label>
-                <input type="number" id="fontSize" value="20">
-            </div>
-            <div class="control-group">
-                <label for="textColor">字体颜色:</label>
-                <input type="color" id="textColor" value="#ffffff">
-            </div>
-            <div class="control-group">
-                <label for="strokeColor">轮廓颜色:</label>
-                <input type="color" id="strokeColor" value="#000000">
-            </div>
-            <div class="control-group">
-                <label for="watermarkColor">水印颜色:</label>
-                <input type="color" id="watermarkColor" value="#ffffff">
-            </div>
-            <div class="control-group">
-                <label for="watermarkText">水印文本:</label>
-                <input type="text" id="watermarkText" value="图片字幕生成器">
-            </div>
-            <div class="control-group">
-                <label for="watermarkStyle">水印样式:</label>
-                <select id="watermarkStyle">
-                    <option value="full">全屏水印</option>
-                    <option value="top-right">右上角</option>
-                    <option value="bottom-right">右下角</option>
-                    <option value="center">居中</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label for="watermarkOpacity">水印透明度:</label>
-                <input type="range" id="watermarkOpacity" min="0.1" max="0.5" step="0.1" value="0.3">
-            </div>
-            <div class="control-group">
-                <label for="watermarkSize">水印大小:</label>
-                <input type="range" id="watermarkSize" min="12" max="36" step="2" value="20">
-            </div>
-        </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="lineHeight">字幕高度(px):</label>
+                        <input type="number" id="lineHeight" value="40">
+                    </div>
+                    <div class="control-group">
+                        <label for="fontSize">字体大小(px):</label>
+                        <input type="number" id="fontSize" value="20">
+                    </div>
+                    <div class="control-group">
+                        <label for="textColor">字体颜色:</label>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                    <div class="control-group">
+                        <label for="strokeColor">轮廓颜色:</label>
+                        <input type="color" id="strokeColor" value="#000000">
+                    </div>
+                    <div class="control-group">
+                        <label for="watermarkColor">水印颜色:</label>
+                        <input type="color" id="watermarkColor" value="#ffffff">
+                    </div>
+                    <div class="control-group">
+                        <label for="watermarkText">水印文本:</label>
+                        <input type="text" id="watermarkText" value="图片字幕生成器">
+                    </div>
+                    <div class="control-group">
+                        <label for="watermarkStyle">水印样式:</label>
+                        <select id="watermarkStyle">
+                            <option value="full">全屏水印</option>
+                            <option value="top-right">右上角</option>
+                            <option value="bottom-right">右下角</option>
+                            <option value="center">居中</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="watermarkOpacity">水印透明度:</label>
+                        <input type="range" id="watermarkOpacity" min="0.1" max="0.5" step="0.1" value="0.3">
+                    </div>
+                    <div class="control-group">
+                        <label for="watermarkSize">水印大小:</label>
+                        <input type="range" id="watermarkSize" min="12" max="36" step="2" value="20">
+                    </div>
+                </div>
 
-        <div class="control-group">
-            <label for="subtitleText">字幕文本（每行一句）:</label>
-            <textarea id="subtitleText" placeholder="在这里输入字幕文本..."></textarea>
-        </div>
+                <div class="control-group subtitle-input-group">
+                    <label for="subtitleText">字幕文本（每行一句）:</label>
+                    <textarea id="subtitleText" placeholder="在这里输入字幕文本..."></textarea>
+                </div>
 
-        <div class="preview-container">
-            <canvas id="previewCanvas"></canvas>
-        </div>
-
-        <div class="button-group">
-            <button id="generateBtn">生成字幕图片</button>
-            <button id="saveBtn">保存图片</button>
+                <div class="button-group">
+                    <button id="generateBtn">生成字幕图片</button>
+                    <button id="saveBtn">保存图片</button>
+                </div>
+            </div>
+            
+            <!-- 右侧预览区 -->
+            <div class="preview-panel">
+                <div class="panel-title">预览区</div>
+                <div class="preview-note">
+                    <span>所有变更会实时显示在下方预览区</span>
+                </div>
+                <div class="preview-container">
+                    <div class="no-image-placeholder" id="noImagePlaceholder">
+                        请在左侧选择一张图片
+                    </div>
+                    <canvas id="previewCanvas"></canvas>
+                </div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

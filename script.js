@@ -1,8 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
+    const noImagePlaceholder = document.getElementById('noImagePlaceholder');
     let currentImage = null;
     let watermarkText = '图片字幕生成器';
+
+    // 初始状态隐藏画布
+    canvas.style.display = 'none';
 
     // 图片加载处理
     document.getElementById('imageInput').addEventListener('change', (e) => {
@@ -13,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const img = new Image();
                 img.onload = () => {
                     currentImage = img;
+                    // 隐藏占位符，显示画布
+                    if (noImagePlaceholder) {
+                        noImagePlaceholder.style.display = 'none';
+                    }
+                    canvas.style.display = 'block';
                     generateSubtitledImage();
                 };
                 img.src = event.target.result;
@@ -21,10 +30,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 监听所有控件的变化
-    const controls = ['lineHeight', 'fontSize', 'textColor', 'strokeColor', 'subtitleText', 'watermarkText', 'watermarkOpacity', 'watermarkStyle', 'watermarkSize'];
+    // 监听所有控件的变化，实时更新预览
+    const controls = [
+        'lineHeight', 
+        'fontSize', 
+        'textColor', 
+        'strokeColor', 
+        'watermarkColor',
+        'subtitleText', 
+        'watermarkText', 
+        'watermarkOpacity', 
+        'watermarkStyle', 
+        'watermarkSize'
+    ];
+    
     controls.forEach(id => {
-        document.getElementById(id).addEventListener('input', generateSubtitledImage);
+        const element = document.getElementById(id);
+        if (element) {
+            // 对不同类型的输入应用不同的事件监听
+            if (element.type === 'range' || element.type === 'color') {
+                // 对于滑块和颜色选择器，实时更新
+                element.addEventListener('input', generateSubtitledImage);
+            } else {
+                // 对于文本输入，在输入和失去焦点时更新
+                element.addEventListener('input', generateSubtitledImage);
+                element.addEventListener('blur', generateSubtitledImage);
+            }
+        }
     });
 
     // 生成按钮点击事件
@@ -32,12 +64,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 保存按钮点击事件
     document.getElementById('saveBtn').addEventListener('click', () => {
+        if (!currentImage) {
+            alert('请先选择一张图片');
+            return;
+        }
+        
         if (!canvas.toDataURL) return;
         const link = document.createElement('a');
         link.download = 'subtitled-image.png';
         link.href = canvas.toDataURL();
         link.click();
     });
+
+    // 当窗口大小变化时，重新生成预览
+    window.addEventListener('resize', debounce(generateSubtitledImage, 200));
+
+    // 防抖函数，避免频繁更新
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
 
     // 生成字幕图片
     function generateSubtitledImage() {
