@@ -36,6 +36,8 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     transition: background-color var(--transition-duration), color var(--transition-duration);
+    position: relative;
+    box-sizing: border-box;
 }
 
 .container {
@@ -49,6 +51,8 @@ body {
     transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
 }
 
 /* 左右布局样式 - 关键部分 */
@@ -57,8 +61,11 @@ body {
     flex-direction: row;
     gap: var(--spacing-md);
     width: 100%;
+    box-sizing: border-box;
+    position: relative;
 }
 
+/* 编辑器面板 - 恢复原来的布局 */
 .editor-panel {
     width: 40%;
     flex: 0 0 40%;
@@ -71,6 +78,7 @@ body {
     box-sizing: border-box;
 }
 
+/* 预览面板 - 恢复原来的布局 */
 .preview-panel {
     width: 60%;
     flex: 0 0 60%;
@@ -97,6 +105,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
 #previewCanvas {
@@ -116,14 +125,14 @@ h1 {
     letter-spacing: -0.5px;
 }
 
+/* 恢复核心控件布局 */
 .controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
     background: var(--background-color);
     border-radius: var(--border-radius);
-    transition: background-color var(--transition-duration);
     width: 100%;
     box-sizing: border-box;
 }
@@ -136,7 +145,6 @@ h1 {
     background: var(--card-background);
     border-radius: var(--border-radius);
     box-shadow: 0 2px 8px var(--shadow-color);
-    transition: transform var(--transition-duration), box-shadow var(--transition-duration);
     width: 100%;
     box-sizing: border-box;
 }
@@ -225,12 +233,14 @@ textarea {
     box-sizing: border-box;
 }
 
+/* 按钮组样式 */
 .button-group {
     display: flex;
     gap: var(--spacing-sm);
     justify-content: center;
     margin-top: var(--spacing-md);
     width: 100%;
+    box-sizing: border-box;
 }
 
 button {
@@ -256,36 +266,88 @@ button:active {
     box-shadow: 0 2px 6px var(--shadow-color);
 }
 
-/* 响应式布局 */
+/* 响应式设计调整 */
+@media (max-width: 1300px) {
+    .sidebar-nav {
+        left: 15px;
+        border-radius: 0 12px 12px 0;
+        padding-left: 5px;
+    }
+}
+
+/* 响应式设计 - 优化移动端显示 */
 @media (max-width: 900px) {
     .app-layout {
         flex-direction: column;
+        padding-bottom: 60px;
     }
     
-    .editor-panel,
+    .editor-panel, 
     .preview-panel {
         width: 100%;
         flex: 1 0 auto;
         max-height: none;
-        padding-right: 0;
+        overflow-x: hidden;
+    }
+    
+    .sidebar-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        transform: none;
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+        background: var(--card-background);
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar-nav ul {
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 0;
+    }
+    
+    .sidebar-nav .nav-link {
+        padding: 10px 0;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .sidebar-nav .nav-link span {
+        display: none;
+    }
+    
+    .sidebar-nav .nav-link i {
+        margin-bottom: 0;
+    }
+    
+    .sidebar-nav .nav-link.active::before {
+        left: 0;
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: 3px;
+        border-radius: 3px 3px 0 0;
     }
     
     .preview-panel {
-        order: -1; /* 在移动端，预览区域放在上方 */
+        order: -1;
     }
     
-    .preview-container {
-        margin-bottom: var(--spacing-md);
-        min-height: 200px;
-    }
-    
-    #previewCanvas {
-        max-height: 50vh;
+    body {
+        padding-bottom: 60px;
     }
     
     .controls {
         grid-template-columns: 1fr;
-        gap: var(--spacing-sm);
+    }
+    
+    .section {
+        scroll-margin-top: 70px;
     }
     
     .button-group {
@@ -297,7 +359,16 @@ button:active {
     }
     
     h1 {
-        font-size: 2em;
+        font-size: 1.8rem;
+    }
+}
+
+/* 平板尺寸优化 */
+@media (min-width: 901px) and (max-width: 1300px) {
+    .sidebar-nav {
+        left: 15px;
+        border-radius: 0 12px 12px 0;
+        padding-left: 5px;
     }
 }
 
@@ -316,7 +387,7 @@ button:active {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--primary-color);
-    margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+    margin: var(--spacing-xs) 0;
     border-left: 3px solid var(--primary-color);
     padding-left: var(--spacing-xs);
 }
@@ -330,8 +401,176 @@ button:active {
     font-size: 0.9rem;
 }
 
+/* 图片输入和字幕输入组样式修复 */
 .image-input-group, .subtitle-input-group {
     border-left: 3px solid var(--primary-color);
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--spacing-sm);
+}
+
+/* 修复section与control-group组合时的样式 */
+.section.control-group {
+    padding: var(--spacing-sm);
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* 侧边导航栏定位方式修改为固定在左侧 */
+.sidebar-nav {
+    position: fixed;
+    left: calc(50% - 630px); 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 55px;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    padding: 10px 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.sidebar-nav ul li {
+    width: 100%;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 0 5px;
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.sidebar-nav .nav-link span {
+    font-size: 0.75rem;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+    position: absolute;
+    left: 60px;
+    background: var(--card-background);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(76, 175, 80, 0.08);
+}
+
+.sidebar-nav .nav-link:hover span {
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar-nav .nav-link.active {
+    color: var(--primary-color);
+    background-color: rgba(76, 175, 80, 0.15);
+}
+
+.sidebar-nav .nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: var(--primary-color);
+    border-radius: 0 3px 3px 0;
+}
+
+/* 区块样式修复 */
+.section {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #ddd;
+    scroll-margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 平板布局优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .editor-panel {
+        width: calc(45% - 50px);
+        flex: 0 0 calc(45% - 50px);
+    }
+    
+    .preview-panel {
+        width: 55%;
+        flex: 0 0 55%;
+    }
+}
+
+/* 优化小屏设备 */
+@media (max-width: 600px) {
+    body {
+        padding: var(--spacing-xs);
+    }
+    
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .control-group {
+        padding: var(--spacing-xs);
+    }
+    
+    .sidebar-nav .nav-link {
+        padding: 8px 0;
+    }
+    
+    .sidebar-nav .nav-link i {
+        font-size: 1.2rem;
+    }
+    
+    .section-title, .panel-title {
+        font-size: 1rem;
+    }
 }
 
 /* 水印区域样式 */
@@ -342,6 +581,11 @@ button:active {
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
 }
 
 /* 禁用状态的水印区域 */
@@ -351,102 +595,103 @@ button:active {
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-.disabled-section .section-title {
-    color: #888;
-    border-left-color: #ccc;
+/* 禁用状态下的水印控件区域 */
+.disabled-section #watermarkControls {
+    pointer-events: none;
 }
 
+/* 水印切换容器 - 确保始终可以点击 */
 .watermark-toggle-container {
     display: flex;
     align-items: center;
     margin-bottom: var(--spacing-sm);
-    padding: 5px 10px;
+    padding: 10px 15px;
     background-color: rgba(76, 175, 80, 0.05);
     border-radius: var(--border-radius);
+    width: 100%;
+    box-sizing: border-box;
+    border-left: 3px solid var(--primary-color);
+    pointer-events: auto !important;
 }
 
+/* 开关标签 */
 .toggle-label {
     margin-left: var(--spacing-sm);
     font-weight: 600;
+    color: var(--text-color);
 }
 
-/* 开关样式改进为滑动效果 */
+/* 开关样式 */
 .switch {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 30px;
+    flex-shrink: 0;
 }
-
-/* 隐藏默认的复选框 */
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* 自定义滑块样式 */
+.switch input { opacity: 0; width: 0; height: 0; }
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: #ccc;
     transition: .4s;
     border-radius: 30px;
 }
-
-/* 滑块上的圆形按钮 */
 .slider:before {
     position: absolute;
     content: "";
-    height: 22px;
-    width: 22px;
-    left: 4px;
-    bottom: 4px;
+    height: 22px; width: 22px;
+    left: 4px; bottom: 4px;
     background-color: white;
     transition: .4s;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-
-/* 选中状态的样式 */
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px var(--primary-color);
-}
-
-/* 滑块移动效果 */
-input:checked + .slider:before {
-    transform: translateX(30px);
-}
-
-/* 添加开/关文字 */
+input:checked + .slider { background-color: var(--primary-color); }
+input:focus + .slider { box-shadow: 0 0 1px var(--primary-color); }
+input:checked + .slider:before { transform: translateX(30px); }
 .slider:after {
     content: "关";
     color: white;
     display: block;
     position: absolute;
     transform: translate(-50%, -50%);
-    top: 50%;
-    left: 70%;
-    font-size: 12px;
-    font-weight: bold;
+    top: 50%; left: 70%;
+    font-size: 12px; font-weight: bold;
+}
+input:checked + .slider:after { content: "开"; left: 30%; }
+
+/* 水印区域内的控件组，应继承通用 .control-group */
+.watermark-section .control-group {
+    /* 继承通用 .control-group 样式 */
+    /* 移除冗余的定义 */
 }
 
-input:checked + .slider:after {
-    content: "开";
-    left: 30%;
+/* 移除 :has 相关样式，依赖 JS 或标准行为 */
+.watermark-section .control-group:has(.switch) {
+    /* 移除 */
+}
+.watermark-section .control-group:has(.switch) .toggle-label {
+    /* 移除 */
 }
 
 /* 隐藏元素 */
 .hidden {
     display: none !important;
+}
+
+/* 确保通用控件样式在水印区生效 */
+.watermark-section input[type="range"],
+.watermark-section input[type="color"],
+.watermark-section select,
+.watermark-section input[type="text"] {
+    /* 确保这些控件继承全局样式或有特定调整 */
+}
+
+/* 移除toggle-control-group相关样式 */
+.watermark-section .control-group.toggle-control-group {
+    /* 移除 */
 }
 
 /* 突出显示字幕输入区 */
@@ -491,4 +736,72 @@ input:checked + .slider:after {
     font-size: 1.2rem;
     border: 2px dashed var(--border-color);
     border-radius: var(--border-radius);
+}
+
+/* 平滑滚动效果 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 优化水印区域内的特定控件样式 */
+.watermark-section input[type="range"] {
+    width: 100%;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+.watermark-section input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--transition-duration), transform var(--transition-duration);
+    box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.watermark-section input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.watermark-section input[type="color"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 40px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0;
+    cursor: pointer;
+}
+
+.watermark-section input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.watermark-section input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: calc(var(--border-radius) - 2px);
+}
+
+.watermark-section select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.watermark-section input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 14px;
 }

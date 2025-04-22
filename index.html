@@ -5,51 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片字幕生成器</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <h1>图片字幕生成器</h1>
         
         <div class="app-layout">
+            <!-- 侧边导航栏 -->
+            <div class="sidebar-nav">
+                <ul>
+                    <li><a href="#image-section" class="nav-link active" title="选择图片"><i class="fas fa-image"></i><span>图片</span></a></li>
+                    <li><a href="#subtitle-section" class="nav-link" title="字幕文本"><i class="fas fa-text-height"></i><span>字幕</span></a></li>
+                    <li><a href="#style-section" class="nav-link" title="字幕样式"><i class="fas fa-paint-brush"></i><span>样式</span></a></li>
+                    <li><a href="#watermark-section" class="nav-link" title="水印设置"><i class="fas fa-copyright"></i><span>水印</span></a></li>
+                    <li><a href="#save-section" class="nav-link" title="保存图片"><i class="fas fa-save"></i><span>保存</span></a></li>
+                </ul>
+            </div>
+
             <!-- 左侧编辑区 -->
             <div class="editor-panel">
                 <div class="panel-title">编辑区</div>
                 
-                <div class="control-group image-input-group">
+                <div id="image-section" class="section control-group image-input-group">
+                    <div class="section-header">
+                        <div class="section-title">选择图片</div>
+                    </div>
                     <label for="imageInput">选择图片：</label>
                     <input type="file" id="imageInput" accept="image/*">
                 </div>
 
                 <!-- 字幕文本输入区 -->
-                <div class="control-group subtitle-input-group">
+                <div id="subtitle-section" class="section control-group subtitle-input-group">
+                    <div class="section-header">
+                        <div class="section-title">字幕文本</div>
+                    </div>
                     <label for="subtitleText">字幕文本（每行一句）:</label>
                     <textarea id="subtitleText" placeholder="在这里输入字幕文本..."></textarea>
                 </div>
 
                 <!-- 字幕样式控制区 -->
-                <div class="section-title">字幕样式设置</div>
-                <div class="controls">
-                    <div class="control-group">
-                        <label for="lineHeight">字幕高度(px):</label>
-                        <input type="number" id="lineHeight" value="100">
+                <div id="style-section" class="section">
+                    <div class="section-header">
+                        <div class="section-title">字幕样式设置</div>
                     </div>
-                    <div class="control-group">
-                        <label for="fontSize">字体大小(px):</label>
-                        <input type="number" id="fontSize" value="70">
-                    </div>
-                    <div class="control-group">
-                        <label for="textColor">字体颜色:</label>
-                        <input type="color" id="textColor" value="#ffffff">
-                    </div>
-                    <div class="control-group">
-                        <label for="strokeColor">轮廓颜色:</label>
-                        <input type="color" id="strokeColor" value="#000000">
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="lineHeight">字幕高度(px):</label>
+                            <input type="number" id="lineHeight" value="100">
+                        </div>
+                        <div class="control-group">
+                            <label for="fontSize">字体大小(px):</label>
+                            <input type="number" id="fontSize" value="70">
+                        </div>
+                        <div class="control-group">
+                            <label for="textColor">字体颜色:</label>
+                            <input type="color" id="textColor" value="#ffffff">
+                        </div>
+                        <div class="control-group">
+                            <label for="strokeColor">轮廓颜色:</label>
+                            <input type="color" id="strokeColor" value="#000000">
+                        </div>
                     </div>
                 </div>
 
                 <!-- 水印控制区，默认折叠 -->
-                <div class="watermark-section">
-                    <div class="section-title">水印设置</div>
+                <div id="watermark-section" class="section watermark-section">
+                    <div class="section-header">
+                        <div class="section-title">水印设置</div>
+                    </div>
                     <div class="watermark-toggle-container">
                         <label class="switch">
                             <input type="checkbox" id="watermarkToggle">
@@ -78,17 +102,49 @@
                         </div>
                         <div class="control-group">
                             <label for="watermarkOpacity">水印透明度:</label>
-                            <input type="range" id="watermarkOpacity" min="0.1" max="0.5" step="0.1" value="0.3">
+                            <input type="range" id="watermarkOpacity" min="0.1" max="1.0" step="0.1" value="0.7">
                         </div>
                         <div class="control-group">
                             <label for="watermarkSize">水印大小:</label>
-                            <input type="range" id="watermarkSize" min="12" max="36" step="2" value="20">
+                            <input type="range" id="watermarkSize" min="12" max="72" step="4" value="24">
+                        </div>
+                        <div class="control-group toggle-control-group">
+                            <label for="watermarkStrokeToggle" class="toggle-label">添加描边:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="watermarkStrokeToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="control-group">
+                            <label for="watermarkStrokeColor">描边颜色:</label>
+                            <input type="color" id="watermarkStrokeColor" value="#000000">
+                        </div>
+                        <div class="control-group">
+                            <label for="watermarkStrokeWidth">描边粗细:</label>
+                            <input type="range" id="watermarkStrokeWidth" min="1" max="5" step="0.5" value="2">
+                        </div>
+                        <div class="control-group toggle-control-group">
+                            <label for="watermarkShadowToggle" class="toggle-label">添加发光效果:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="watermarkShadowToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="control-group">
+                            <label for="watermarkFontWeight">字体粗细:</label>
+                            <select id="watermarkFontWeight">
+                                <option value="normal">常规</option>
+                                <option value="bold" selected>粗体</option>
+                                <option value="bolder">特粗</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button id="generateBtn">生成字幕图片</button>
+                <div id="save-section" class="section button-group">
+                    <div class="section-header">
+                        <div class="section-title">保存图片</div>
+                    </div>
                     <button id="saveBtn">保存图片</button>
                 </div>
             </div>

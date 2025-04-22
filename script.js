@@ -5,27 +5,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const watermarkToggle = document.getElementById('watermarkToggle');
     const watermarkControls = document.getElementById('watermarkControls');
     const watermarkSection = document.querySelector('.watermark-section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
     
     let currentImage = null;
     let watermarkText = '图片字幕生成器';
-    let watermarkEnabled = false; // 默认不启用水印
-
-    // 初始状态隐藏画布和水印控制
+    
+    // 初始状态隐藏画布
     canvas.style.display = 'none';
-    watermarkControls.classList.add('hidden');
-    watermarkSection.classList.add('disabled-section');
-
-    // 水印开关事件监听
-    watermarkToggle.addEventListener('change', (e) => {
-        watermarkEnabled = e.target.checked;
-        if (watermarkEnabled) {
+    
+    // 初始化水印状态
+    function updateWatermarkState(enabled) {
+        if (enabled) {
             watermarkControls.classList.remove('hidden');
             watermarkSection.classList.remove('disabled-section');
         } else {
             watermarkControls.classList.add('hidden');
             watermarkSection.classList.add('disabled-section');
         }
-        generateSubtitledImage();
+        // 如果有图片，则重新生成
+        if (currentImage) {
+            generateSubtitledImage();
+        }
+    }
+    
+    // 设置初始状态
+    updateWatermarkState(watermarkToggle.checked);
+
+    // 设置导航链接点击事件
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+
+    // 滚动监听，高亮当前区域的导航项
+    function highlightNavOnScroll() {
+        const scrollPosition = window.scrollY + 100; // 添加一些偏移以提前激活
+        
+        // 找到当前区域并高亮导航
+        let currentSectionId = sections[0].id; // 默认第一个区域
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                currentSectionId = section.id;
+            }
+        });
+        
+        // 更新导航高亮
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${currentSectionId}`) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // 监听滚动事件
+    window.addEventListener('scroll', highlightNavOnScroll);
+    
+    // 首次加载时调用一次以设置初始高亮
+    highlightNavOnScroll();
+
+    // 水印开关事件监听
+    watermarkToggle.addEventListener('change', (e) => {
+        updateWatermarkState(e.target.checked);
     });
 
     // 图片加载处理
@@ -61,7 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'watermarkText', 
         'watermarkOpacity', 
         'watermarkStyle', 
-        'watermarkSize'
+        'watermarkSize',
+        'watermarkStrokeToggle',
+        'watermarkStrokeColor',
+        'watermarkStrokeWidth',
+        'watermarkShadowToggle',
+        'watermarkFontWeight'
     ];
     
     controls.forEach(id => {
@@ -78,9 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
-    // 生成按钮点击事件
-    document.getElementById('generateBtn').addEventListener('click', generateSubtitledImage);
 
     // 保存按钮点击事件
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -173,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // 仅在水印开关打开时绘制水印
-        if (watermarkEnabled && watermarkToggle.checked) {
+        if (watermarkToggle.checked) {
             drawWatermark();
         }
     }
@@ -181,14 +231,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 单独抽取水印绘制函数，方便控制
     function drawWatermark() {
         const watermarkText = document.getElementById('watermarkText').value || '图片字幕生成器';
-        const watermarkOpacity = parseFloat(document.getElementById('watermarkOpacity').value) || 0.3;
+        const watermarkOpacity = parseFloat(document.getElementById('watermarkOpacity').value) || 0.7;
         const watermarkStyle = document.getElementById('watermarkStyle').value;
         const watermarkSize = parseInt(document.getElementById('watermarkSize').value);
+        const watermarkStrokeEnabled = document.getElementById('watermarkStrokeToggle').checked;
+        const watermarkStrokeColor = document.getElementById('watermarkStrokeColor').value;
+        const watermarkStrokeWidth = parseFloat(document.getElementById('watermarkStrokeWidth').value) || 2;
+        const watermarkShadowEnabled = document.getElementById('watermarkShadowToggle').checked;
+        const watermarkFontWeight = document.getElementById('watermarkFontWeight').value;
         
         ctx.save();
         ctx.globalAlpha = watermarkOpacity;
-        ctx.font = `${watermarkSize}px Arial`;
+        ctx.font = `${watermarkFontWeight} ${watermarkSize}px Arial`;
         ctx.fillStyle = document.getElementById('watermarkColor').value;
+        
+        // 添加发光效果
+        if (watermarkShadowEnabled) {
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        }
         
         const textWidth = ctx.measureText(watermarkText).width;
         const padding = 20;
@@ -203,27 +266,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 for (let x = -canvas.width; x < canvas.width; x += pattern.width) {
                     for (let y = -canvas.height; y < canvas.height; y += pattern.height) {
-                        ctx.fillText(watermarkText, x, y);
+                        drawWatermarkText(watermarkText, x, y, watermarkStrokeEnabled, watermarkStrokeColor, watermarkStrokeWidth);
                     }
                 }
                 break;
 
             case 'top-right':
                 ctx.textAlign = 'right';
-                ctx.fillText(watermarkText, canvas.width - padding, watermarkSize + padding);
+                drawWatermarkText(watermarkText, canvas.width - padding, watermarkSize + padding, watermarkStrokeEnabled, watermarkStrokeColor, watermarkStrokeWidth);
                 break;
 
             case 'bottom-right':
                 ctx.textAlign = 'right';
-                ctx.fillText(watermarkText, canvas.width - padding, canvas.height - padding);
+                drawWatermarkText(watermarkText, canvas.width - padding, canvas.height - padding, watermarkStrokeEnabled, watermarkStrokeColor, watermarkStrokeWidth);
                 break;
 
             case 'center':
                 ctx.textAlign = 'center';
-                ctx.fillText(watermarkText, canvas.width / 2, canvas.height / 2);
+                drawWatermarkText(watermarkText, canvas.width / 2, canvas.height / 2, watermarkStrokeEnabled, watermarkStrokeColor, watermarkStrokeWidth);
                 break;
         }
         
         ctx.restore();
+    }
+    
+    // 帮助函数：绘制带描边的水印文本
+    function drawWatermarkText(text, x, y, strokeEnabled, strokeColor, strokeWidth) {
+        if (strokeEnabled) {
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.strokeText(text, x, y);
+        }
+        ctx.fillText(text, x, y);
     }
 });
