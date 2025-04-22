@@ -2,11 +2,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
     const noImagePlaceholder = document.getElementById('noImagePlaceholder');
+    const watermarkToggle = document.getElementById('watermarkToggle');
+    const watermarkControls = document.getElementById('watermarkControls');
+    const watermarkSection = document.querySelector('.watermark-section');
+    
     let currentImage = null;
     let watermarkText = '图片字幕生成器';
+    let watermarkEnabled = false; // 默认不启用水印
 
-    // 初始状态隐藏画布
+    // 初始状态隐藏画布和水印控制
     canvas.style.display = 'none';
+    watermarkControls.classList.add('hidden');
+    watermarkSection.classList.add('disabled-section');
+
+    // 水印开关事件监听
+    watermarkToggle.addEventListener('change', (e) => {
+        watermarkEnabled = e.target.checked;
+        if (watermarkEnabled) {
+            watermarkControls.classList.remove('hidden');
+            watermarkSection.classList.remove('disabled-section');
+        } else {
+            watermarkControls.classList.add('hidden');
+            watermarkSection.classList.add('disabled-section');
+        }
+        generateSubtitledImage();
+    });
 
     // 图片加载处理
     document.getElementById('imageInput').addEventListener('change', (e) => {
@@ -108,6 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = currentImage.width;
         canvas.height = currentImage.height + (lineHeight * lines.length);
 
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         // 绘制图片
         ctx.drawImage(currentImage, 0, 0);
 
@@ -149,7 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(line, canvas.width / 2, y + (lineHeight / 2) + (fontSize / 3));
         });
 
-        // 绘制水印
+        // 仅在水印开关打开时绘制水印
+        if (watermarkEnabled && watermarkToggle.checked) {
+            drawWatermark();
+        }
+    }
+    
+    // 单独抽取水印绘制函数，方便控制
+    function drawWatermark() {
         const watermarkText = document.getElementById('watermarkText').value || '图片字幕生成器';
         const watermarkOpacity = parseFloat(document.getElementById('watermarkOpacity').value) || 0.3;
         const watermarkStyle = document.getElementById('watermarkStyle').value;
@@ -195,5 +225,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         ctx.restore();
-    };
+    }
 });
