@@ -10,6 +10,7 @@
     --spacing-xs: 8px;
     --spacing-sm: 16px;
     --spacing-md: 24px;
+    --spacing-lg: 32px;
     --border-radius: 8px;
     --transition-duration: 0.3s;
 }
@@ -45,7 +46,7 @@ body {
     flex-direction: column;
     gap: var(--spacing-md);
     background: var(--card-background);
-    padding: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-md);
     border-radius: var(--border-radius);
     box-shadow: 0 4px 20px var(--shadow-color);
     transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
@@ -59,7 +60,7 @@ body {
 .app-layout {
     display: flex;
     flex-direction: row;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -78,7 +79,7 @@ body {
     box-sizing: border-box;
 }
 
-/* 预览面板 - 恢复原来的布局 */
+/* 预览面板 - 恢复原来的布局并添加内边距 */
 .preview-panel {
     width: 60%;
     flex: 0 0 60%;
@@ -89,6 +90,8 @@ body {
     max-height: 85vh;
     overflow-y: auto;
     box-sizing: border-box;
+    padding-left: var(--spacing-sm); /* 添加左侧内边距 */
+    padding-right: var(--spacing-sm); /* 添加右侧内边距 */
 }
 
 .preview-container {
@@ -106,6 +109,7 @@ body {
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.05);
     box-sizing: border-box;
+    border: 1px solid var(--border-color); /* 添加边框，提高对比度 */
 }
 
 #previewCanvas {
@@ -280,6 +284,7 @@ button:active {
     .app-layout {
         flex-direction: column;
         padding-bottom: 60px;
+        gap: var(--spacing-md); /* 调整垂直间距 */
     }
     
     .editor-panel, 
@@ -288,6 +293,20 @@ button:active {
         flex: 1 0 auto;
         max-height: none;
         overflow-x: hidden;
+        padding-left: var(--spacing-sm); 
+        padding-right: var(--spacing-sm);
+    }
+    
+    .preview-panel {
+        margin-bottom: var(--spacing-md); /* 增加底部间距 */
+    }
+    
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    .panel-title, .section-title {
+        margin-left: 0; /* 确保标题从边缘开始 */
     }
     
     .sidebar-nav {
@@ -380,6 +399,7 @@ button:active {
     margin-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: var(--spacing-xs);
+    text-align: left;
 }
 
 /* 新增的区域标题样式 */
@@ -399,6 +419,7 @@ button:active {
     margin-bottom: var(--spacing-sm);
     border-left: 3px solid var(--primary-color);
     font-size: 0.9rem;
+    text-align: left; /* 确保文本左对齐 */
 }
 
 /* 图片输入和字幕输入组样式修复 */
@@ -420,7 +441,7 @@ button:active {
 /* 侧边导航栏定位方式修改为固定在左侧 */
 .sidebar-nav {
     position: fixed;
-    left: calc(50% - 630px); 
+    left: calc(50% - 670px); /* 增加与内容区的距离 */
     top: 50%;
     transform: translateY(-50%);
     width: 55px;
@@ -550,10 +571,12 @@ button:active {
     
     .container {
         padding: var(--spacing-sm);
+        border-radius: var(--spacing-xs); /* 减小圆角 */
     }
     
     h1 {
         font-size: 1.5rem;
+        margin-bottom: var(--spacing-sm); /* 减少标题下方间距 */
     }
 
     .control-group {
@@ -570,6 +593,10 @@ button:active {
     
     .section-title, .panel-title {
         font-size: 1rem;
+    }
+    
+    .preview-container {
+        min-height: 200px; /* 减小最小高度 */
     }
 }
 
@@ -804,4 +831,18 @@ html {
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 14px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1300px) and (min-width: 901px) {
+    .sidebar-nav {
+        left: 15px;
+        border-radius: 0 12px 12px 0;
+        padding-left: 5px;
+    }
+    
+    /* 调整容器内边距，在侧边导航紧贴屏幕时给左侧更多空间 */
+    .container {
+        padding-left: calc(var(--spacing-md) + 40px);
+    }
 }
