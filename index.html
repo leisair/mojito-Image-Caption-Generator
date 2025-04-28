@@ -4,166 +4,858 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片字幕生成器</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <h1>图片字幕生成器</h1>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.2)',
+                            300: 'rgba(255, 255, 255, 0.3)',
+                            400: 'rgba(255, 255, 255, 0.4)',
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                        sm: '4px',
+                        md: '8px',
+                        lg: '12px',
+                        xl: '16px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 背景图片设置 */
+        body {
+            background-image: url('https://1379b672.cloudflare-imgbed-dvk.pages.dev/file/1745671961638_PixPin_2024-07-21_11-27-04.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
         
-        <div class="app-layout">
-            <!-- 侧边导航栏 -->
-            <div class="sidebar-nav">
-                <ul>
-                    <li><a href="#image-section" class="nav-link active" title="选择图片"><i class="fas fa-image"></i><span>图片</span></a></li>
-                    <li><a href="#subtitle-section" class="nav-link" title="字幕文本"><i class="fas fa-text-height"></i><span>字幕</span></a></li>
-                    <li><a href="#style-section" class="nav-link" title="字幕样式"><i class="fas fa-paint-brush"></i><span>样式</span></a></li>
-                    <li><a href="#watermark-section" class="nav-link" title="水印设置"><i class="fas fa-copyright"></i><span>水印</span></a></li>
-                    <li><a href="#save-section" class="nav-link" title="保存图片"><i class="fas fa-save"></i><span>保存</span></a></li>
-                </ul>
-            </div>
+        /* 背景渐变覆盖层 - 确保文字可读性 */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.6));
+            z-index: -1;
+        }
+        
+        /* 玻璃效果 - 调整为更符合新背景的颜色 */
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-darker {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .glass-card {
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 导航栏样式 */
+        .nav-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0.5rem;
+            transition: all 0.3s ease;
+            position: fixed;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+        }
+        
+        .nav-container:hover {
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-item {
+            margin: 0.75rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-icon {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link.active .nav-icon {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15),
+                        inset 0 0 8px 2px rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-link:hover .nav-icon {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-text {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link.active .nav-text {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .nav-link:hover .nav-text {
+            color: rgba(255, 255, 255, 1);
+        }
+        
+        /* 内容区域 */
+        .content-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 自定义滑块样式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 自定义开关样式 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.25);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: rgba(78, 132, 193, 0.8);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* 自定义下拉选择框样式 */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' width='18px' height='18px'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            border-radius: 0.5rem !important;
+            transition: all 0.3s ease !important;
+            padding-right: 2rem !important;
+        }
+        
+        /* 解决选择菜单打开时的样式 */
+        select:focus {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+            outline: none !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        select:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+        }
+        
+        /* 自定义下拉菜单选项 */
+        select option {
+            background-color: rgba(30, 41, 59, 0.95) !important;
+            color: white !important;
+            padding: 10px !important;
+            border: none !important;
+        }
+        
+        /* Firefox 特定样式 */
+        @-moz-document url-prefix() {
+            select {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+            
+            select:hover, select:focus {
+                background-color: rgba(255, 255, 255, 0.2) !important;
+            }
+        }
+        
+        /* 确保Canvas适应容器 */
+        #previewCanvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+        
+        /* 标题样式增强 */
+        h1 {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            color: rgba(255, 255, 255, 1);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 功能区标题样式 */
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
 
+        /* 在小屏幕设备上隐藏侧边导航 */
+        @media (max-width: 768px) {
+            .nav-container {
+                display: none;
+            }
+        }
+        
+        /* 响应式高度调整 */
+        @media (max-height: 768px) {
+            .section-compact {
+                margin-bottom: 0.75rem;
+            }
+            
+            .editor-scroll-area {
+                height: calc(100vh - 9rem);
+                padding-top: 0;
+            }
+            
+            .preview-area {
+                height: calc(100vh - 9rem);
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .preview-container-area {
+                flex: 1;
+                min-height: calc(100vh - 18rem);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .compact-form .glass {
+                padding: 0.5rem;
+            }
+            
+            .compact-spacing {
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        @media (min-height: 769px) {
+            .editor-scroll-area {
+                height: calc(100vh - 11rem);
+                padding-top: 0;
+            }
+            
+            .preview-area {
+                height: calc(100vh - 11rem);
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .preview-container-area {
+                flex: 1;
+                min-height: calc(100vh - 22rem);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
+        /* 预览容器的占位符样式 */
+        .no-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+        }
+        
+        /* 预览画布容器样式 */
+        #previewCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* 添加自定义样式，优化textarea的拉伸体验 */
+        textarea {
+            resize: vertical;
+            transition: height 0.1s ease;
+            will-change: height;
+        }
+        
+        /* 美化textarea的拉伸手柄 */
+        textarea::-webkit-resizer {
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.3) transparent;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 0 0 4px 0;
+        }
+        
+        /* Slogan样式和动画 */
+        .slogan-container {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .slogan-text {
+            letter-spacing: 0.25em;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+        
+        .slogan-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.3s forwards;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slogan-char:nth-child(1) { animation-delay: 0.1s; }
+        .slogan-char:nth-child(2) { animation-delay: 0.2s; }
+        .slogan-char:nth-child(3) { animation-delay: 0.3s; }
+        .slogan-char:nth-child(4) { animation-delay: 0.4s; }
+        .slogan-char:nth-child(5) { animation-delay: 0.5s; }
+        .slogan-char:nth-child(6) { animation-delay: 0.6s; }
+        .slogan-char:nth-child(7) { animation-delay: 0.7s; }
+        
+        .slogan-container:hover .slogan-char {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .slogan-container:active .slogan-char {
+            transform: translateY(1px);
+        }
+        
+        .slogan-underline {
+            height: 1px;
+            width: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: expandWidth 1.2s ease-in-out forwards;
+            animation-delay: 0.8s;
+        }
+        
+        @keyframes expandWidth {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 120px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-mesh min-h-screen font-sans text-white overflow-x-hidden p-2 md:p-4">
+    <!-- 背景覆盖层 -->
+    <div class="bg-overlay"></div>
+    
+    <!-- 侧边导航栏 - 位于容器外左侧并垂直居中 -->
+    <nav class="nav-container">
+        <ul class="flex flex-col items-center justify-center gap-8">
+            <li class="nav-item">
+                <a href="#image-section" class="nav-link active flex flex-col items-center transition-all duration-300 group" title="选择图片">
+                    <div class="nav-icon">
+                        <i class="fas fa-image text-lg"></i>
+                    </div>
+                    <span class="nav-text">图片</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#subtitle-section" class="nav-link flex flex-col items-center transition-all duration-300 group" title="字幕文本">
+                    <div class="nav-icon">
+                        <i class="fas fa-text-height text-lg"></i>
+                </div>
+                    <span class="nav-text">字幕</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#style-section" class="nav-link flex flex-col items-center transition-all duration-300 group" title="字幕样式">
+                    <div class="nav-icon">
+                        <i class="fas fa-paint-brush text-lg"></i>
+                    </div>
+                    <span class="nav-text">样式</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#watermark-section" class="nav-link flex flex-col items-center transition-all duration-300 group" title="水印设置">
+                    <div class="nav-icon">
+                        <i class="fas fa-copyright text-lg"></i>
+                </div>
+                    <span class="nav-text">水印</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#save-section" class="nav-link flex flex-col items-center transition-all duration-300 group" title="保存图片">
+                    <div class="nav-icon">
+                        <i class="fas fa-save text-lg"></i>
+                    </div>
+                    <span class="nav-text">保存</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="max-w-7xl mx-auto glass rounded-2xl p-4 md:p-6">
+        <h1 class="text-2xl md:text-4xl font-bold text-center mb-2 md:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">图片字幕生成器</h1>
+        
+        <!-- Slogan部分 -->
+        <div class="slogan-container text-center mb-4 md:mb-6 relative overflow-hidden">
+            <p class="slogan-text text-sm md:text-base tracking-wider text-white/80 font-light italic">
+                <span class="slogan-char">重</span>
+                <span class="slogan-char">塑</span>
+                <span class="slogan-char">瞬</span>
+                <span class="slogan-char">间</span>
+                <span class="slogan-char">的</span>
+                <span class="slogan-char">意</span>
+                <span class="slogan-char">义</span>
+            </p>
+            <div class="slogan-underline mx-auto mt-1"></div>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-4">
             <!-- 左侧编辑区 -->
-            <div class="editor-panel">
-                <div class="panel-title">编辑区</div>
-                
-                <div id="image-section" class="section control-group image-input-group">
-                    <div class="section-header">
-                        <div class="section-title">选择图片</div>
-                    </div>
-                    <label for="imageInput">选择图片：</label>
-                    <input type="file" id="imageInput" accept="image/*">
-                </div>
+            <div class="lg:w-2/5 editor-panel">
+                <h2 class="panel-title">编辑区</h2>
+                <div class="content-area p-3 md:p-4 editor-scroll-area overflow-y-auto compact-form">
+                    <div id="image-section" class="section section-compact mb-5">
+                        <h3 class="section-title">选择图片</h3>
+                        <div class="glass glass-card rounded-xl p-3">
+                            <label for="imageInput" class="block mb-2 font-medium">选择图片：</label>
+                            <input type="file" id="imageInput" accept="image/*" 
+                                   class="w-full bg-white/10 border border-white/20 rounded-lg cursor-pointer file:mr-4 file:py-2 file:px-4
+                                          file:rounded-lg file:border-0 file:bg-white/20 file:text-white
+                                          hover:file:bg-white/30 transition-all duration-300">
+                        </div>
+                        </div>
 
-                <!-- 字幕文本输入区 -->
-                <div id="subtitle-section" class="section control-group subtitle-input-group">
-                    <div class="section-header">
-                        <div class="section-title">字幕文本</div>
+                    <!-- 字幕文本输入区 -->
+                    <div id="subtitle-section" class="section section-compact mb-5">
+                        <h3 class="section-title">字幕文本</h3>
+                        <div class="glass glass-card rounded-xl p-3">
+                            <label for="subtitleText" class="block mb-2 font-medium">字幕文本（每行一句）:</label>
+                            <textarea id="subtitleText" rows="5" placeholder="在这里输入字幕文本..." 
+                                      class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white placeholder-white/50 
+                                             focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300
+                                             resize-y min-h-[120px]"></textarea>
+                        </div>
                     </div>
-                    <label for="subtitleText">字幕文本（每行一句）:</label>
-                    <textarea id="subtitleText" placeholder="在这里输入字幕文本..."></textarea>
-                </div>
 
-                <!-- 字幕样式控制区 -->
-                <div id="style-section" class="section">
-                    <div class="section-header">
-                        <div class="section-title">字幕样式设置</div>
-                    </div>
-                    <div class="controls">
-                        <div class="control-group">
-                            <label for="lineHeight">字幕高度(px):</label>
-                            <input type="number" id="lineHeight" value="100">
-                        </div>
-                        <div class="control-group">
-                            <label for="fontSize">字体大小(px):</label>
-                            <input type="number" id="fontSize" value="70">
-                        </div>
-                        <div class="control-group">
-                            <label for="textColor">字体颜色:</label>
-                            <input type="color" id="textColor" value="#ffffff">
-                        </div>
-                        <div class="control-group">
-                            <label for="strokeColor">轮廓颜色:</label>
-                            <input type="color" id="strokeColor" value="#000000">
-                        </div>
-                    </div>
-                </div>
+                    <!-- 字幕样式控制区 -->
+                    <div id="style-section" class="section section-compact mb-5">
+                        <h3 class="section-title">字幕样式设置</h3>
+                        <div class="glass glass-card rounded-xl p-4">
+                            <!-- 字体样式设置 -->
+                            <div class="mb-5">
+                                <h4 class="text-white/90 text-sm font-medium mb-3 pb-1 border-b border-white/10 flex items-center">
+                                    <i class="fas fa-font mr-2 text-white/80"></i>字体设置
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="lineHeight" class="block mb-1 font-medium">字幕高度(px):</label>
+                                        <input type="number" id="lineHeight" value="100" 
+                                               class="w-full bg-white/10 border border-white/20 rounded-lg p-1 text-white 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                    </div>
+                                    
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="fontSize" class="block mb-1 font-medium">字体大小(px):</label>
+                                        <input type="number" id="fontSize" value="70" 
+                                               class="w-full bg-white/10 border border-white/20 rounded-lg p-1 text-white 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                    </div>
+                                    
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="textColor" class="block mb-1 font-medium">字体颜色:</label>
+                                        <input type="color" id="textColor" value="#ffffff" 
+                                               class="w-full h-8 bg-white/10 border border-white/20 rounded-lg p-1 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                    </div>
 
-                <!-- 水印控制区，默认折叠 -->
-                <div id="watermark-section" class="section watermark-section">
-                    <div class="section-header">
-                        <div class="section-title">水印设置</div>
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="strokeColor" class="block mb-1 font-medium">描边颜色:</label>
+                                        <input type="color" id="strokeColor" value="#000000" 
+                                               class="w-full h-8 bg-white/10 border border-white/20 rounded-lg p-1 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                    </div>
+                                    
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="strokeWidth" class="block mb-1 font-medium">描边粗细:</label>
+                                        <input type="range" id="strokeWidth" min="1" max="5" step="0.5" value="3" 
+                                               class="w-full">
+                                    </div>
+                                    
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="fontWeight" class="block mb-1 font-medium">字体粗细:</label>
+                                        <select id="fontWeight" 
+                                                class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white 
+                                                       focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                            <option value="normal">常规</option>
+                                            <option value="bold" selected>粗体</option>
+                                            <option value="bolder">特粗</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 背景设置 -->
+                            <div>
+                                <h4 class="text-white/90 text-sm font-medium mb-3 pb-1 border-b border-white/10 flex items-center">
+                                    <i class="fas fa-layer-group mr-2 text-white/80"></i>背景设置
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="subtitlePosition" class="block mb-1 font-medium">字幕位置:</label>
+                                        <select id="subtitlePosition" name="subtitlePosition" 
+                                               class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                            <option value="below">图片底部新增区域</option>
+                                            <option value="overlay" selected>在原图底部开始添加</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="p-2 glass rounded-lg">
+                                        <label for="backgroundMode" class="block mb-1 font-medium">背景样式:</label>
+                                        <select id="backgroundMode" name="backgroundMode"
+                                               class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white 
+                                                      focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
+                                            <option value="stretch">底部颜色拉伸</option>
+                                            <option value="repeat" selected>底部区域复制</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="watermark-toggle-container">
-                        <label class="switch">
+
+                    <!-- 水印控制区 -->
+                    <div id="watermark-section" class="section section-compact mb-5 watermark-section">
+                        <h3 class="section-title">水印设置</h3>
+                        <div class="glass glass-card rounded-xl p-3">
+                            <div class="flex items-center mb-3">
+                                <label class="toggle-switch mr-3">
                             <input type="checkbox" id="watermarkToggle">
-                            <span class="slider"></span>
+                                    <span class="toggle-slider"></span>
                         </label>
-                        <label for="watermarkToggle" class="toggle-label">启用水印</label>
+                                <label for="watermarkToggle" class="font-medium">启用水印</label>
                     </div>
                     
-                    <div id="watermarkControls" class="controls">
-                        <div class="control-group">
-                            <label for="watermarkText">水印文本:</label>
-                            <input type="text" id="watermarkText" value="图片字幕生成器">
+                            <div id="watermarkControls" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkText" class="block mb-1 font-medium">水印文本:</label>
+                                    <input type="text" id="watermarkText" value="图片字幕生成器" 
+                                           class="w-full bg-white/10 border border-white/20 rounded-lg p-1 text-white 
+                                                  focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkColor">水印颜色:</label>
-                            <input type="color" id="watermarkColor" value="#ffffff">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkColor" class="block mb-1 font-medium">水印颜色:</label>
+                                    <input type="color" id="watermarkColor" value="#ffffff" 
+                                           class="w-full h-8 bg-white/10 border border-white/20 rounded-lg p-1 
+                                                  focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkStyle">水印样式:</label>
-                            <select id="watermarkStyle">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkStyle" class="block mb-1 font-medium">水印样式:</label>
+                                    <select id="watermarkStyle" 
+                                            class="w-full bg-white/10 border border-white/20 rounded-lg p-1 text-white 
+                                                   focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
                                 <option value="full">全屏水印</option>
                                 <option value="top-right">右上角</option>
                                 <option value="bottom-right">右下角</option>
                                 <option value="center">居中</option>
                             </select>
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkOpacity">水印透明度:</label>
-                            <input type="range" id="watermarkOpacity" min="0.1" max="1.0" step="0.1" value="0.7">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkOpacity" class="block mb-1 font-medium">水印透明度:</label>
+                                    <input type="range" id="watermarkOpacity" min="0.1" max="1.0" step="0.1" value="0.7" 
+                                           class="w-full">
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkSize">水印大小:</label>
-                            <input type="range" id="watermarkSize" min="12" max="72" step="4" value="24">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkSize" class="block mb-1 font-medium">水印大小:</label>
+                                    <input type="range" id="watermarkSize" min="12" max="72" step="4" value="24" 
+                                           class="w-full">
                         </div>
-                        <div class="control-group toggle-control-group">
-                            <label for="watermarkStrokeToggle" class="toggle-label">添加描边:</label>
-                            <label class="switch">
+                                
+                                <div class="p-2 glass rounded-lg flex items-center justify-between">
+                                    <label for="watermarkStrokeToggle" class="font-medium">添加描边:</label>
+                                    <label class="toggle-switch">
                                 <input type="checkbox" id="watermarkStrokeToggle" checked>
-                                <span class="slider"></span>
+                                        <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkStrokeColor">描边颜色:</label>
-                            <input type="color" id="watermarkStrokeColor" value="#000000">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkStrokeColor" class="block mb-1 font-medium">描边颜色:</label>
+                                    <input type="color" id="watermarkStrokeColor" value="#000000" 
+                                           class="w-full h-8 bg-white/10 border border-white/20 rounded-lg p-1 
+                                                  focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkStrokeWidth">描边粗细:</label>
-                            <input type="range" id="watermarkStrokeWidth" min="1" max="5" step="0.5" value="2">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkStrokeWidth" class="block mb-1 font-medium">描边粗细:</label>
+                                    <input type="range" id="watermarkStrokeWidth" min="1" max="5" step="0.5" value="2" 
+                                           class="w-full">
                         </div>
-                        <div class="control-group toggle-control-group">
-                            <label for="watermarkShadowToggle" class="toggle-label">添加发光效果:</label>
-                            <label class="switch">
+                                
+                                <div class="p-2 glass rounded-lg flex items-center justify-between">
+                                    <label for="watermarkShadowToggle" class="font-medium">添加发光效果:</label>
+                                    <label class="toggle-switch">
                                 <input type="checkbox" id="watermarkShadowToggle">
-                                <span class="slider"></span>
+                                        <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <div class="control-group">
-                            <label for="watermarkFontWeight">字体粗细:</label>
-                            <select id="watermarkFontWeight">
+                                
+                                <div class="p-2 glass rounded-lg">
+                                    <label for="watermarkFontWeight" class="block mb-1 font-medium">字体粗细:</label>
+                                    <select id="watermarkFontWeight" 
+                                            class="w-full bg-white/10 border border-white/20 rounded-lg p-1 text-white 
+                                                   focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300">
                                 <option value="normal">常规</option>
                                 <option value="bold" selected>粗体</option>
                                 <option value="bolder">特粗</option>
                             </select>
+                                </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="save-section" class="section button-group">
-                    <div class="section-header">
-                        <div class="section-title">保存图片</div>
+                    <div id="save-section" class="section section-compact mb-5">
+                        <h3 class="section-title">保存图片</h3>
+                        <div class="glass glass-card rounded-xl p-3 flex justify-center">
+                            <button id="saveBtn" class="px-6 py-3 bg-white/20 backdrop-filter backdrop-blur-md rounded-lg font-medium 
+                                                       flex items-center gap-2 hover:shadow-lg hover:translate-y-[-2px] transition-all duration-300
+                                                       border border-white/30 hover:bg-white/30 hover:border-white/40 text-white">
+                                <i class="fas fa-download"></i> 保存图片
+                            </button>
+                        </div>
                     </div>
-                    <button id="saveBtn">保存图片</button>
                 </div>
             </div>
             
             <!-- 右侧预览区 -->
-            <div class="preview-panel">
-                <div class="panel-title">预览区</div>
-                <div class="preview-note">
-                    <span>所有变更会实时显示在下方预览区</span>
-                </div>
-                <div class="preview-container">
-                    <div class="no-image-placeholder" id="noImagePlaceholder">
-                        请在左侧选择一张图片
+            <div class="lg:w-3/5 preview-panel">
+                <h2 class="panel-title">预览区</h2>
+                <div class="content-area p-3 md:p-4 preview-area flex flex-col">
+                    <div class="text-white/70 text-sm mb-3 italic">
+                        <i class="fas fa-info-circle mr-2"></i>所有变更会实时显示在下方预览区
                     </div>
-                    <canvas id="previewCanvas"></canvas>
+                    
+                    <div class="preview-container glass rounded-xl p-3 flex-1 flex items-center justify-center preview-container-area overflow-auto">
+                        <div class="no-image-placeholder text-white/60 text-center flex flex-col items-center justify-center w-full h-full" id="noImagePlaceholder">
+                            <i class="fas fa-image text-4xl mb-3 block"></i>
+                            <span class="text-lg">请在左侧选择一张图片</span>
+                        </div>
+                        <canvas id="previewCanvas" class="hidden max-w-full max-h-full"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="script.js"></script>
+    
+    <!-- Slogan交互效果脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sloganContainer = document.querySelector('.slogan-container');
+            const sloganChars = document.querySelectorAll('.slogan-char');
+            
+            // 点击slogan时的效果
+            sloganContainer.addEventListener('click', function() {
+                // 重置动画
+                sloganChars.forEach((char, index) => {
+                    char.style.animation = 'none';
+                    char.offsetHeight; // 触发重排
+                    char.style.animation = `fadeInUp 0.3s forwards ${index * 0.1}s`;
+                    char.style.opacity = '0';
+                    char.style.transform = 'translateY(10px)';
+                });
+                
+                // 重置下划线动画
+                const underline = document.querySelector('.slogan-underline');
+                underline.style.animation = 'none';
+                underline.offsetHeight; // 触发重排
+                underline.style.width = '0';
+                underline.style.animation = 'expandWidth 1.2s ease-in-out forwards 0.8s';
+            });
+            
+            // 随机闪烁效果
+            setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * sloganChars.length);
+                const char = sloganChars[randomIndex];
+                
+                char.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
+                char.style.color = 'white';
+                
+                setTimeout(() => {
+                    char.style.textShadow = '';
+                    char.style.color = '';
+                }, 300);
+            }, 3000);
+        });
+    </script>
 </body>
 </html>
