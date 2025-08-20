@@ -1,6 +1,6 @@
 # 图片字幕生成器 - 重塑瞬间的意义
 
-![图片字幕生成器](https://1379b672.cloudflare-imgbed-dvk.pages.dev/file/1745671961638_PixPin_2024-07-21_11-27-04.png)
+![图片字幕生成器](https://tuchuang.happyfreefuclaude.dpdns.org/file/projects/pication/1745671961638_PixPin_2024-07-21_11-27-04.png)
 
 ## 产品理念："重塑瞬间的意义"
 你可以用这个工具记录和分享某个重要瞬间，分享到小红书、微博、抖音等社交平台。
